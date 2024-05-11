@@ -1,9 +1,9 @@
 const express = require('express');
-const pool = require('./database');
-const app = express();
-const port = 3042;
+const router = express.Router();
+const pool = require('../db/SQL/database');
 
-app.get('/dados', async (req, res) => {
+// Definição da rota
+router.get('/dados', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM exemplo');
     res.json(rows);
@@ -13,6 +13,4 @@ app.get('/dados', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
-});
+module.exports = router;
