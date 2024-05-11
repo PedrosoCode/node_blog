@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../db/SQL/database');
+const pool = require('../db/database');
 
 // Definição da rota
 router.get('/dados', async (req, res) => {
