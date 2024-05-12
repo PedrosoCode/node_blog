@@ -25,6 +25,7 @@ const verificarToken = (req, res, next) => {
     res.status(400).send('Token inválido.');
   }
 };
+module.exports = { verificarToken };
 
 // Exemplo de rota protegida
 app.get('/dados-protegidos', verificarToken, (req, res) => {
@@ -52,3 +53,5 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}`);
 });
+
+
