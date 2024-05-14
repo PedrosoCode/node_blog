@@ -1,44 +1,27 @@
 require('dotenv').config(); // Garanta que isso está no topo do arquivo principal
 const express = require('express');
-const pool = require('./src/db/database'); 
-const app = express();
 const cors = require('cors');
-const port = 3042;
 const jwt = require('jsonwebtoken');
+const app = express();
+const port = process.env.PORT || 3042;
 
-const secret = process.env.JWT_SECRET;
+const authRoutes = require('./src/routes/authRoutes');
+const postRoutes = require('./src/routes/postRoutes');
+const userRoutes = require('./src/routes/userRoutes');
+const { verificarToken } = require('./src/middlewares/authMiddleware');
 
 app.use(express.json());
 app.use(cors());
 
-const verificarToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
-
-  if (!token) {
-    return res.status(401).send('Acesso negado. Nenhum token fornecido.');
-  }
-
-  try {
-    const verificado = jwt.verify(token, process.env.JWT_SECRET);
-    req.usuario = verificado;
-    next();
-  } catch (error) {
-    res.status(400).send('Token inválido.');
-  }
-};
-module.exports = { verificarToken };
+// Use as rotas
+app.use('/api/auth', authRoutes);
+app.use('/api', postRoutes);
+app.use('/api', userRoutes);
 
 // Exemplo de rota protegida
 app.get('/dados-protegidos', verificarToken, (req, res) => {
   res.send('Acesso aos dados protegidos.');
 });
-
-const authRoutes = require('./src/routes/authRoutes');
-const exemploRoutes = require('./src/routes/exemploRoutes');
-
-app.use('/auth', authRoutes);
-app.use(exemploRoutes);
 
 // Middleware para rotas não encontradas
 app.use((req, res, next) => {
@@ -55,5 +38,3 @@ app.use((err, req, res, next) => {
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:${port}`);
 });
-
-
