@@ -15,11 +15,13 @@ const verificarToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
-  if (!token) return res.status(401).send('Acesso negado. Nenhum token fornecido.');
+  if (!token) {
+    return res.status(401).send('Acesso negado. Nenhum token fornecido.');
+  }
 
   try {
-    const verificado = jwt.verify(token, secret); // Usa a variável 'secret' que guarda o JWT_SECRET
-    req.usuario = verificado;  // Adiciona os dados do usuário decodificados ao objeto req
+    const verificado = jwt.verify(token, process.env.JWT_SECRET);
+    req.usuario = verificado;
     next();
   } catch (error) {
     res.status(400).send('Token inválido.');

@@ -2,6 +2,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../db/database'); // Ajuste o caminho conforme necessário
+const secret = process.env.JWT_SECRET;
 
 const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
@@ -21,7 +22,7 @@ const loginUser = async (req, res) => {
     if (result.rows.length > 0) {
       const isValid = await bcrypt.compare(password, result.rows[0].password);
       if (isValid) {
-        const token = jwt.sign({ id: result.rows[0].id }, 'seu_segredo_jwt', { expiresIn: '1h' });
+        const token = jwt.sign({ id: result.rows[0].id }, secret, { expiresIn: '1h' });
         res.send({ token });
       } else {
         res.status(401).send('Senha incorreta');
