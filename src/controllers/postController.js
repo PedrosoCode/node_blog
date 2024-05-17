@@ -25,6 +25,17 @@ const listarPosts = async (req, res) => {
   }
 };
 
+const listarPostsDoUsuario = async (req, res) => {
+  try {
+    const userId = req.usuario.id;
+    const posts = await pool.query('SELECT * FROM tb_posts WHERE user_id = $1', [userId]);
+    res.json(posts.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+};
+
 const atualizarPost = async (req, res) => {
   try {
     const { id } = req.params;
@@ -83,6 +94,7 @@ module.exports = {
   criarPost,
   listarPosts,
   atualizarPost,
+  listarPostsDoUsuario,
   deletarPost,
   obterPost,
 };
