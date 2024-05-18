@@ -1,0 +1,6 @@
+CREATE TABLE tb_images (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id),
+  path TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

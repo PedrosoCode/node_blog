@@ -8,15 +8,24 @@ const port = process.env.PORT || 3042;
 const authRoutes = require('./src/routes/authRoutes');
 const postRoutes = require('./src/routes/postRoutes');
 const userRoutes = require('./src/routes/userRoutes');
+const imageRoutes = require('./src/routes/imageRoutes');
 const { verificarToken } = require('./src/middlewares/authMiddleware');
 
 app.use(express.json());
 app.use(cors());
+app.use('/uploads', express.static('uploads')); // Servir arquivos estáticos da pasta uploads
+
+
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'src', 'uploads')));
+
 
 // Use as rotas
 app.use('/api/auth', authRoutes);
 app.use('/api', postRoutes);
 app.use('/api', userRoutes);
+app.use('/api', imageRoutes); 
+app.use('/uploads', express.static('uploads'));
 
 // Exemplo de rota protegida
 app.get('/dados-protegidos', verificarToken, (req, res) => {
