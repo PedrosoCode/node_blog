@@ -1,7 +1,6 @@
-// src/controllers/authController.js
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const pool = require('../db/database'); // Ajuste o caminho conforme necessário
+const pool = require('../db/database');
 const secret = process.env.JWT_SECRET;
 
 const registerUser = async (req, res) => {
@@ -22,7 +21,7 @@ const loginUser = async (req, res) => {
     if (result.rows.length > 0) {
       const isValid = await bcrypt.compare(password, result.rows[0].password);
       if (isValid) {
-        const token = jwt.sign({ id: result.rows[0].id }, secret, { expiresIn: '1h' });
+        const token = jwt.sign({ id: result.rows[0].id, role_id: result.rows[0].role_id }, secret, { expiresIn: '1h' });
         res.send({ token });
       } else {
         res.status(401).send('Senha incorreta');
@@ -35,4 +34,17 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+const verifyToken = async (req, res) => {
+  try {
+    const result = await pool.query('SELECT role FROM tb_stc_user_roles WHERE id = $1', [req.usuario.role_id]);
+    if (result.rows.length > 0) {
+      res.json({ role: result.rows[0].role });
+    } else {
+      res.status(404).send('Role não encontrado');
+    }
+  } catch (err) {
+    res.status(500).send('Erro no servidor');
+  }
+};
+
+module.exports = { registerUser, loginUser, verifyToken };
