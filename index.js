@@ -10,6 +10,7 @@ const postRoutes = require('./src/routes/postRoutes');
 const userRoutes = require('./src/routes/userRoutes');
 const imageRoutes = require('./src/routes/imageRoutes');
 const footerRoutes = require('./src/routes/footerRoutes');
+const productRoutes = require('./src/routes/productRoutes');
 const { verificarToken } = require('./src/middlewares/authMiddleware');
 
 app.use(express.json());
@@ -27,6 +28,7 @@ app.use('/api', postRoutes);
 app.use('/api', userRoutes);
 app.use('/api', imageRoutes); 
 app.use('/api', footerRoutes); 
+app.use('/api', productRoutes); 
 app.use('/uploads', express.static('uploads'));
 
 // Exemplo de rota protegida

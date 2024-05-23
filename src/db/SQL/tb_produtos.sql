@@ -5,3 +5,7 @@ CREATE TABLE tb_produtos (
     especificacoes_tecnicas TEXT,
     preco FLOAT NOT NULL
 );
+
+INSERT INTO public.tb_produtos(
+	id, titulo, descricao, especificacoes_tecnicas, preco)
+	VALUES (1, 'testeTitulo','testeDesc','testeEspec', 20);
