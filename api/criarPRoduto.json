@@ -1,0 +1,9 @@
+{
+    "id": 3,
+    "titulo": "Produto Exemplo",
+    "descricao": "Descrição do produto exemplo",
+    "especificacoes_tecnicas": "Especificações técnicas do produto exemplo",
+    "preco": 99.99,
+    "disponivel": null,
+    "user_id": 11
+}
