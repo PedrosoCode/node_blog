@@ -1,13 +1,18 @@
 const pool = require('../db/database');
+const path = require('path');
+const fs = require('fs');
 
 const criarProduto = async (req, res) => {
   try {
-    const { titulo, descricao , especificacoes_tecnicas, preco} = req.body;
+    const { titulo, descricao, especificacoes_tecnicas, preco } = req.body;
     const userId = req.usuario.id;
+    const imagePath = `/uploads/${req.file.filename}`; // Caminho da imagem
+
     const newProduct = await pool.query(
-      'INSERT INTO tb_produtos (titulo, descricao, especificacoes_tecnicas, preco, user_id) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [titulo, descricao, especificacoes_tecnicas, preco, userId]
+      'INSERT INTO tb_produtos (titulo, descricao, especificacoes_tecnicas, preco, user_id, disponivel, image_path) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      [titulo, descricao, especificacoes_tecnicas, preco, userId, true, imagePath] // Assumindo que "disponivel" é true por padrão
     );
+
     res.json(newProduct.rows[0]);
   } catch (err) {
     console.error(err.message);
@@ -41,13 +46,13 @@ const atualizarProduto = async (req, res) => {
       'UPDATE tb_produtos SET titulo = $1, descricao = $2, especificacoes_tecnicas = $3, preco = $4 WHERE id = $5 RETURNING *',
       [titulo, descricao, especificacoes_tecnicas, preco, id]
     );
+
     res.json(updatedProduct.rows[0]);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
   }
 };
-
 
 const deletarProduto = async (req, res) => {
   try {
@@ -60,6 +65,13 @@ const deletarProduto = async (req, res) => {
       return res.status(403).json('Ação proibida');
     }
 
+    const imagePath = path.join(__dirname, '..', '..', produto.rows[0].image_path);
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
+    } else {
+      console.error('Arquivo não encontrado:', imagePath);
+    }
+
     await pool.query('DELETE FROM tb_produtos WHERE id = $1', [id]);
     res.json('Produto deletado com sucesso');
   } catch (err) {
@@ -67,8 +79,6 @@ const deletarProduto = async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
-
-
 
 module.exports = {
   obterProduto,

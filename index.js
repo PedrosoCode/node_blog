@@ -1,3 +1,5 @@
+//FIXME  - quando o front apaga uma imagem, apenas seus metadados são removidos do SQL, sendo que o arquivo permanece armazenado
+
 require('dotenv').config(); // Garanta que isso está no topo do arquivo principal
 const express = require('express');
 const cors = require('cors');
