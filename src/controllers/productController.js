@@ -6,7 +6,11 @@ const criarProduto = async (req, res) => {
   try {
     const { titulo, descricao, especificacoes_tecnicas, preco } = req.body;
     const userId = req.usuario.id;
-    const imagePath = `/uploads/${req.file.filename}`; // Caminho da imagem
+    let imagePath = null;
+
+    if (req.file) {
+      imagePath = `/uploads/${req.file.filename}`; // Caminho da imagem
+    }
 
     const newProduct = await pool.query(
       'INSERT INTO tb_produtos (titulo, descricao, especificacoes_tecnicas, preco, user_id, disponivel, image_path) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
@@ -66,7 +70,7 @@ const deletarProduto = async (req, res) => {
     }
 
     const imagePath = path.join(__dirname, '..', '..', produto.rows[0].image_path);
-    if (fs.existsSync(imagePath)) {
+    if (produto.rows[0].image_path && fs.existsSync(imagePath)) {
       fs.unlinkSync(imagePath);
     } else {
       console.error('Arquivo não encontrado:', imagePath);
