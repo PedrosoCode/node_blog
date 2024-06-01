@@ -13,6 +13,7 @@ const userRoutes = require('./src/routes/userRoutes');
 const imageRoutes = require('./src/routes/imageRoutes');
 const footerRoutes = require('./src/routes/footerRoutes');
 const productRoutes = require('./src/routes/productRoutes');
+const cartRoutes = require('./src/routes/cartRoutes');
 const { verificarToken } = require('./src/middlewares/authMiddleware');
 
 app.use(express.json());
@@ -32,6 +33,7 @@ app.use('/api', imageRoutes);
 app.use('/api', footerRoutes); 
 app.use('/api', productRoutes); 
 app.use('/uploads', express.static('uploads'));
+app.use('/api', cartRoutes);
 
 // Exemplo de rota protegida
 app.get('/dados-protegidos', verificarToken, (req, res) => {
