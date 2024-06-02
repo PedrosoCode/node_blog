@@ -1,3 +1,5 @@
+//TODO - mudar o obter para uma stored procedure para melhor manutenção
+
 const pool = require('../db/database');
 
 const adicionarAoCarrinho = async (req, res) => {
@@ -101,46 +103,47 @@ const removerDoCarrinho = async (req, res) => {
 
 const criarPedido = async (req, res) => {
   try {
-    const usuario_id = req.usuario.id;
+      const usuario_id = req.usuario.id;
 
-    // Obter itens do carrinho do usuário
-    const carrinho = await pool.query(
-      'SELECT * FROM tb_compras_carrinho_itens WHERE carrinho_id = $1',
-      [usuario_id]
-    );
-
-    if (carrinho.rows.length === 0) {
-      return res.status(400).json('Carrinho vazio');
-    }
-
-    // Calcular total do pedido
-    const total = carrinho.rows.reduce((acc, item) => acc + (item.quantidade * item.preco_unitario), 0);
-
-    // Criar pedido
-    const novoPedido = await pool.query(
-      'INSERT INTO tb_compras_pedidos (usuario_id, total, status) VALUES ($1, $2, $3) RETURNING *',
-      [usuario_id, total, 'Pendente']
-    );
-
-    const pedido_id = novoPedido.rows[0].id;
-
-    // Inserir itens do pedido
-    for (let item of carrinho.rows) {
-      await pool.query(
-        'INSERT INTO tb_compras_pedidos_itens (pedido_id, produto_id, quantidade, preco_unitario) VALUES ($1, $2, $3, $4)',
-        [pedido_id, item.produto_id, item.quantidade, item.preco_unitario]
+      // Obter itens do carrinho do usuário
+      const carrinho = await pool.query(
+          'SELECT * FROM tb_compras_carrinho_itens WHERE carrinho_id = $1',
+          [usuario_id]
       );
-    }
 
-    // Limpar carrinho
-    await pool.query('DELETE FROM tb_compras_carrinho_itens WHERE carrinho_id = $1', [usuario_id]);
+      if (carrinho.rows.length === 0) {
+          return res.status(400).json('Carrinho vazio');
+      }
 
-    res.json(novoPedido.rows[0]);
+      // Calcular total do pedido
+      const total = carrinho.rows.reduce((acc, item) => acc + (item.quantidade * item.preco_unitario), 0);
+
+      // Criar pedido
+      const novoPedido = await pool.query(
+          'INSERT INTO tb_compras_pedidos (usuario_id, total, status) VALUES ($1, $2, $3) RETURNING *',
+          [usuario_id, total, 'Pendente']
+      );
+
+      const pedido_id = novoPedido.rows[0].id;
+
+      // Inserir itens do pedido
+      for (let item of carrinho.rows) {
+          await pool.query(
+              'INSERT INTO tb_compras_pedidos_itens (pedido_id, produto_id, quantidade, preco_unitario) VALUES ($1, $2, $3, $4)',
+              [pedido_id, item.produto_id, item.quantidade, item.preco_unitario]
+          );
+      }
+
+      // Limpar carrinho
+      await pool.query('DELETE FROM tb_compras_carrinho_itens WHERE carrinho_id = $1', [usuario_id]);
+
+      res.json(novoPedido.rows[0]);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Erro no servidor');
+      console.error(err.message);
+      res.status(500).send('Erro no servidor');
   }
 };
+
 
 const obterPedidos = async (req, res) => {
   try {
