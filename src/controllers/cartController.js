@@ -36,6 +36,35 @@ const adicionarAoCarrinho = async (req, res) => {
       res.status(500).send('Erro no servidor');
     }
   };
+
+  const atualizarQuantidade = async (req, res) => {
+    try {
+        const { itemId } = req.params;
+        const { quantidade } = req.body;
+
+        const usuario_id = req.usuario.id;
+
+        // Verificar se o item pertence ao carrinho do usuário
+        const itemExistente = await pool.query(
+            'SELECT * FROM tb_compras_carrinho_itens WHERE id = $1 AND carrinho_id = $2',
+            [itemId, usuario_id]
+        );
+
+        if (itemExistente.rows.length === 0) {
+            return res.status(404).json('Item não encontrado no carrinho');
+        }
+
+        await pool.query(
+            'UPDATE tb_compras_carrinho_itens SET quantidade = $1 WHERE id = $2',
+            [quantidade, itemId]
+        );
+
+        res.json({ message: 'Quantidade do item atualizada no carrinho' });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Erro no servidor');
+    }
+};
   
 
 const obterCarrinho = async (req, res) => {
@@ -133,5 +162,6 @@ module.exports = {
   obterCarrinho,
   removerDoCarrinho,
   criarPedido,
-  obterPedidos
+  obterPedidos,
+  atualizarQuantidade
 };
