@@ -34,6 +34,20 @@ const obterProduto = async (req, res) => {
   }
 };
 
+const obterProdutoPorId = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const product = await pool.query('SELECT * FROM tb_produtos WHERE id = $1', [id]);
+      if (product.rows.length === 0) {
+          return res.status(404).json('Produto não encontrado');
+      }
+      res.json(product.rows[0]);
+  } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server Error');
+  }
+};
+
 const atualizarProduto = async (req, res) => {
   try {
     const { id } = req.params;
@@ -89,4 +103,5 @@ module.exports = {
   criarProduto,
   atualizarProduto,
   deletarProduto,
+  obterProdutoPorId,
 };
