@@ -7,7 +7,8 @@ const {
   removerDoCarrinho,
   criarPedido,
   obterPedidos,
-  atualizarQuantidade 
+  atualizarQuantidade,
+  obterPedidoPorId,
 } = require('../controllers/cartController');
 
 router.post('/carrinho', verificarToken, adicionarAoCarrinho);
@@ -17,5 +18,6 @@ router.put('/carrinho/:itemId', verificarToken, atualizarQuantidade); // Adicion
 
 router.post('/pedido', verificarToken, criarPedido);
 router.get('/pedidos', verificarToken, obterPedidos);
+router.get('/pedidos/:id', verificarToken, obterPedidoPorId); 
 
 module.exports = router;

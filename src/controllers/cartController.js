@@ -147,16 +147,48 @@ const criarPedido = async (req, res) => {
 
 const obterPedidos = async (req, res) => {
   try {
-    const usuario_id = req.usuario.id;
-    const pedidos = await pool.query(
-      'SELECT * FROM tb_compras_pedidos WHERE usuario_id = $1',
-      [usuario_id]
-    );
+      const usuario_id = req.usuario.id;
+      const pedidos = await pool.query(
+          'SELECT * FROM tb_compras_pedidos WHERE usuario_id = $1',
+          [usuario_id]
+      );
 
-    res.json(pedidos.rows);
+      const pedidosComItens = await Promise.all(pedidos.rows.map(async (pedido) => {
+          const itens = await pool.query(
+              'SELECT i.*, p.titulo, p.descricao, p.image_path FROM tb_compras_pedidos_itens i JOIN tb_produtos p ON i.produto_id = p.id WHERE i.pedido_id = $1',
+              [pedido.id]
+          );
+          return { ...pedido, itens: itens.rows.length > 0 ? itens.rows : [] };
+      }));
+
+      res.json(pedidosComItens);
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Erro no servidor');
+      console.error(err.message);
+      res.status(500).send('Erro no servidor');
+  }
+};
+
+const obterPedidoPorId = async (req, res) => {
+  try {
+      const { id } = req.params;
+      const pedido = await pool.query(
+          'SELECT * FROM tb_compras_pedidos WHERE id = $1 AND usuario_id = $2',
+          [id, req.usuario.id]
+      );
+
+      if (pedido.rows.length === 0) {
+          return res.status(404).json('Pedido não encontrado');
+      }
+
+      const itens = await pool.query(
+          'SELECT i.*, p.titulo, p.descricao, p.image_path FROM tb_compras_pedidos_itens i JOIN tb_produtos p ON i.produto_id = p.id WHERE i.pedido_id = $1',
+          [id]
+      );
+
+      res.json({ ...pedido.rows[0], itens: itens.rows });
+  } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Erro no servidor');
   }
 };
 
@@ -166,5 +198,6 @@ module.exports = {
   removerDoCarrinho,
   criarPedido,
   obterPedidos,
-  atualizarQuantidade
+  atualizarQuantidade,
+  obterPedidoPorId
 };
