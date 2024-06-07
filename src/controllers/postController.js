@@ -17,7 +17,20 @@ const criarPost = async (req, res) => {
 
 const listarPosts = async (req, res) => {
   try {
-    const allPosts = await pool.query('SELECT * FROM tb_posts');
+    const { title, author } = req.query;
+    let query = 'SELECT * FROM tb_posts WHERE 1=1';
+    let queryParams = [];
+
+    if (title) {
+      query += ' AND title ILIKE $' + (queryParams.length + 1);
+      queryParams.push(`%${title}%`);
+    }
+    if (author) {
+      query += ' AND user_id = $' + (queryParams.length + 1);
+      queryParams.push(author);
+    }
+
+    const allPosts = await pool.query(query, queryParams);
     res.json(allPosts.rows);
   } catch (err) {
     console.error(err.message);
