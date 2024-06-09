@@ -6,8 +6,9 @@ const secret = process.env.JWT_SECRET;
 const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
+  const roleId = 1; // Definir role_id como 1 por padrão
   try {
-    const result = await pool.query('INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *', [username, email, hashedPassword]);
+    const result = await pool.query('INSERT INTO users (username, email, password, role_id) VALUES ($1, $2, $3, $4) RETURNING *', [username, email, hashedPassword, roleId]);
     res.status(201).send({ user: result.rows[0] });
   } catch (error) {
     res.status(500).send(error.message);
