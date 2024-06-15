@@ -1,85 +1,112 @@
-processo de vinculação a uma VM
+# Guia de Instalação e Configuração da VM
 
---> passos iniciais
-1 > instalar o ubuntu server
-2 > pré definir a instalação do postgre
-3 > aceitar as configurações padrão
+## Passos Iniciais
 
-após a instalação da vm e logar com o usuário
+1. Instalar o Ubuntu Server.
+2. Pré-definir a instalação do PostgreSQL.
+3. Aceitar as configurações padrão.
 
-dar sudo apt update
-dar sudo apt upgrade
+## Após a Instalação da VM
 
-instalar o NGIX 
-$ sudo apt install nginx
+### Atualização do Sistema
 
-Após a instalação, inicie o serviço Nginx e habilite-o para iniciar automaticamente na inicialização.
+1. Logar com o usuário.
+2. Atualizar os pacotes:
+   `sudo apt update`
+   `sudo apt upgrade`
 
-$ sudo systemctl start nginx
-$ sudo systemctl enable nginx
+### Instalação do Nginx
 
-instalar git para poder clonar os projetos de front e back
+1. Instalar o Nginx:
+   `sudo apt install nginx`
+2. Iniciar o serviço Nginx e habilitar para iniciar automaticamente na inicialização:
+   `sudo systemctl start nginx`
+   `sudo systemctl enable nginx`
 
-$ sudo apt update
-$ sudo apt install git
+### Instalação do Git
 
-instalar o node
+1. Instalar o Git para clonar os projetos de front e back:
+   `sudo apt update`
+   `sudo apt install git`
 
-$ sudo apt install nodejs
-$ sudo apt update
-$ sudo apt upgrade
+### Instalação do Node.js
 
-instalar o nvm para poder atualizar o node para a versão 20, muito provavelmente ele terá vindo por padrão em uma versão 18 <
+1. Instalar o Node.js:
+   `sudo apt install nodejs`
+   `sudo apt update`
+   `sudo apt upgrade`
+2. Instalar o NVM para atualizar o Node.js para a versão 20 (provavelmente a versão padrão será 18):
+   `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash`
+   `source ~/.nvm/nvm.sh`
+3. Instalar a versão 20 do Node.js:
+   `nvm install 20`
+4. Verificar a versão instalada do Node.js:
+   `node -v`
 
-$ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-$ source ~/.nvm/nvm.sh
+### Clonando os Projetos
 
-entrar no node_blog e dar um npm install para pegar todas as dependencias
+1. Clonar os projetos:
+   `git clone https://github.com/PedrosoCode/node_blog`
+   `git clone https://github.com/PedrosoCode/app_blog`
 
-$ nvm install 20
+### Executando os Projetos
 
-para ter certeza, pode ser verificado com node -v a versão 
+1. Entrar no diretório do projeto `node_blog` e instalar as dependências:
+   `cd node_blog`
+   `npm install`
+2. Executar o backend:
+   `node index.js &`
+3. Testar um GET estático com o comando curl:
+   `curl http://localhost:3042/helloworld`
 
-dar clone nos projetos 
+### Verificação e Finalização de Processos
 
-https://github.com/PedrosoCode/node_blog
+1. Verificar se a API está rodando:
+   `ps aux | grep node`
+2. Parar um processo:
+   `kill (numero do processo)`
 
-https://github.com/PedrosoCode/app_blog
+### Ajustes no Terminal
 
-podemos rodar mais de um processo em segundo plano, como front e o back usando o operador & conforme exemplo abaixo
+1. Se o teclado ficar transparente, execute:
+   `reset`
 
-node index.js &
+### Instalação do PostgreSQL
 
-a essa altura ainda não temos o frontend iniciado, mas podemos testar um get estático com esse comando de curl
+1. Instalar o PostgreSQL:
+   `sudo apt install postgresql postgresql-contrib -y`
+2. Iniciar o serviço PostgreSQL e habilitar para iniciar automaticamente:
+   `sudo systemctl start postgresql`
+   `sudo systemctl enable postgresql`
 
-curl http://localhost:3042/helloworld
+## Programas a Instalar
 
-quando não tivermos certeza se a api está rodando, podemos usar esse comando para verificar o processo
+- Nginx
+- Git
+- Node.js
+- PostgreSQL
 
-ps aux | grep node
+## Comandos Interessantes de Saber
 
-para parar o processo podemos rodar um kill (numero do processo) que é a coluna após o nome do usuário
+### Atualização de Pacotes
 
-muito provavel que o teclado ainda funcione, mas fique transparente, para isso apenas escreva "reset"
+`sudo apt update`
+`sudo apt upgrade`
 
-para que a API funcione corretamente, precisamos ter o postgre instalado, afinal nossos dandos estão armezanados em tabelas relacionais
+### Gerenciamento de Serviços
 
-sudo apt install postgresql postgresql-contrib -y
+`sudo systemctl start <service>`
+`sudo systemctl enable <service>`
 
-para iniciar sempre automaticamente podemos usar
+### Verificação de Processos
 
-sudo systemctl start postgresql
-sudo systemctl enable postgresql
+`ps aux | grep <process>`
+`kill <process_id>`
 
+### Ajustes no Terminal
 
+`reset`
 
-programas a instalar
-NGINX
+## TODO
 
-comandos interessantes de saber
-
-pacotes a instalar
-
-
-//TODO - instalar e usar guest additions do VB para permitir copiar e colar entre máquinas
-
+- Instalar e usar as Guest Additions do VirtualBox para permitir copiar e colar entre máquinas.
