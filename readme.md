@@ -97,83 +97,65 @@
 3. Conceda privilégios ao novo usuário no banco de dados:
    `GRANT ALL PRIVILEGES ON DATABASE nome_do_banco TO nome_do_usuario;`
 
-   como já configuramos o banco (em partes) precisamos de um meio de transferir o TAR de BKP para a VM, para isso vamos usar Secure Copy e SSH
+Como já configuramos o banco (em partes), precisamos de um meio de transferir o TAR de BKP para a VM, para isso vamos usar Secure Copy e SSH:
 
-   sudo apt install openssh-client -y
+   `sudo apt install openssh-client -y`
+   `sudo systemctl start ssh`
+   `sudo systemctl enable ssh`
+   `ip a` para coletar o IP de ambas as máquinas
 
-   sudo systemctl start ssh
-   sudo systemctl enable ssh
+No terminal da máquina original, tente conectar à VM usando SSH com o endereço IP correto (suponha que o IP da VM seja 192.168.1.100):
 
-   usar ip a para coletar o IP de ambas as máquinas
-
-   No terminal da máquina original, tente conectar à VM usando SSH com o endereço IP correto (suponha que o IP da VM seja 192.168.1.100):
-
-ssh gabriel@192.168.1.100
+   `ssh gabriel@192.168.1.100`
 Nota: Substitua 192.168.1.100 pelo endereço IP real da sua VM.
 
-exemplo de transferência de arquivo da máquina original para a VM - OBS faça isso enquanto não estiver em uma sessão ssh, caso esteja execute um exit
+Exemplo de transferência de arquivo da máquina original para a VM - OBS: faça isso enquanto não estiver em uma sessão SSH, caso esteja, execute um `exit`:
 
-scp /home/gabriel/gits/sharedVM/bkp_blog gabriel@192.168.1.116:/home/gabriel/bkps/
+   `scp /home/gabriel/gits/sharedVM/bkp_blog gabriel@192.168.1.116:/home/gabriel/bkps/`
 
-exemplo de conexão de sessão ssh 
-ssh gabriel@192.168.1.116
+Exemplo de conexão de sessão SSH:
 
-como a VM não tem uma GUI, é melhor conectar a ela usando o pgadmin direto da máquina original, para fazermos a conexão podemos seguir esses passos
+   `ssh gabriel@192.168.1.116`
+
+Como a VM não tem uma GUI, é melhor conectar a ela usando o pgAdmin direto da máquina original. Para fazermos a conexão, podemos seguir esses passos:
 
 Configuração do PostgreSQL para Conexões Remotas
-Encontrar e Editar postgresql.conf:
+Encontrar e Editar `postgresql.conf`:
 
-Primeiro, encontre o arquivo postgresql.conf:
+Primeiro, encontre o arquivo `postgresql.conf`:
 
-bash
-Copiar código
-sudo find / -name postgresql.conf
+   `sudo find / -name postgresql.conf`
 Em seguida, edite o arquivo:
 
-bash
-Copiar código
-sudo nano /etc/postgresql/14/main/postgresql.conf
-Alterar listen_addresses para permitir todas as interfaces:
+   `sudo nano /etc/postgresql/14/main/postgresql.conf`
+Alterar `listen_addresses` para permitir todas as interfaces:
 
-plaintext
-Copiar código
-listen_addresses = '*'
+   `listen_addresses = '*'`
 Salve as mudanças (Ctrl+O, Enter) e saia (Ctrl+X).
 
-Encontrar e Editar pg_hba.conf:
+Encontrar e Editar `pg_hba.conf`:
 
-Primeiro, encontre o arquivo pg_hba.conf:
+Primeiro, encontre o arquivo `pg_hba.conf`:
 
-bash
-Copiar código
-sudo find / -name pg_hba.conf
+   `sudo find / -name pg_hba.conf`
 Em seguida, edite o arquivo:
 
-bash
-Copiar código
-sudo nano /etc/postgresql/14/main/pg_hba.conf
+   `sudo nano /etc/postgresql/14/main/pg_hba.conf`
 Adicione a seguinte linha para permitir conexões de qualquer IP com autenticação MD5:
 
-plaintext
-Copiar código
-host    all             all             0.0.0.0/0               md5
+   `host all all 0.0.0.0/0 md5`
 Salve as mudanças (Ctrl+O, Enter) e saia (Ctrl+X).
 
 Reiniciar o PostgreSQL:
 
 Reinicie o serviço PostgreSQL para aplicar as mudanças:
 
-bash
-Copiar código
-sudo systemctl restart postgresql
+   `sudo systemctl restart postgresql`
 Verificar o Status do PostgreSQL:
 
 Verifique se o PostgreSQL está rodando corretamente:
 
-bash
-Copiar código
-sudo systemctl status postgresql
-
+   `sudo systemctl status postgresql`
 
 ## Programas a Instalar
 
@@ -186,22 +168,22 @@ sudo systemctl status postgresql
 
 ### Atualização de Pacotes
 
-`sudo apt update`
-`sudo apt upgrade`
+   `sudo apt update`
+   `sudo apt upgrade`
 
 ### Gerenciamento de Serviços
 
-`sudo systemctl start <service>`
-`sudo systemctl enable <service>`
+   `sudo systemctl start <service>`
+   `sudo systemctl enable <service>`
 
 ### Verificação de Processos
 
-`ps aux | grep <process>`
-`kill <process_id>`
+   `ps aux | grep <process>`
+   `kill <process_id>`
 
 ### Ajustes no Terminal
 
-`reset`
+   `reset`
 
 ## TODO
 
