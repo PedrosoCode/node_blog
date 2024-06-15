@@ -24,6 +24,10 @@ app.use('/uploads', express.static('uploads')); // Servir arquivos estáticos da
 const path = require('path');
 app.use('/uploads', express.static(path.join(__dirname, 'src', 'uploads')));
 
+// Adicione a rota estática "Hello, World!"
+app.get('/helloworld', (req, res) => {
+  res.send('Hello, World!');
+});
 
 // Use as rotas
 app.use('/api/auth', authRoutes);
