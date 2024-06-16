@@ -169,6 +169,41 @@ Para restaurar o banco, podemos usar o seguinte comando `pg_restore --clean -U p
 
 Ao conectar a VM pela máquina original, no pgadmin podemos rodar um `select * from users`, ou simplesmente verificar o esquema de tabelas, para confirmar se o restore funcionou.
 
+# Guia de Hospedagem de Aplicativo React com Nginx no Ubuntu Server
+
+## Passo 1: Construir o Aplicativo React
+
+Antes de hospedar, você precisa construir seu aplicativo React. Vá até a raiz do seu projeto React e execute `npm install` e `npm run build`. Isso criará uma pasta `build` contendo os arquivos prontos para produção.
+
+## Passo 2: Instalar Nginx no Servidor Ubuntu
+
+Se Nginx ainda não estiver instalado no seu servidor Ubuntu, instale-o com os comandos `sudo apt update` e `sudo apt install nginx`.
+
+## Passo 3: Configurar Nginx
+
+### Copiar os Arquivos do Build para o Diretório do Servidor
+
+Vamos copiar os arquivos gerados no passo 1 para o diretório onde Nginx servirá esses arquivos. Por exemplo, você pode copiá-los para `/var/www/app_blog` com os comandos `sudo mkdir -p /var/www/app_blog` e `sudo cp -r build/* /var/www/app_blog`.
+
+### Configurar Nginx para Servir o Seu Aplicativo React
+
+Crie um novo arquivo de configuração Nginx com o comando `sudo nano /etc/nginx/sites-available/app_blog` e adicione a seguinte configuração que irei deixar na pasta API/conf.nginx
+
+### Ativar a Configuração do Site
+
+Crie um link simbólico para ativar esta configuração com o comando `sudo ln -s /etc/nginx/sites-available/app_blog /etc/nginx/sites-enabled/`.
+
+### Remover o Site Padrão
+
+Remova a configuração padrão do Nginx, se não for usá-la, com o comando `sudo rm /etc/nginx/sites-enabled/default`.
+
+### Verificar as Permissões
+
+Certifique-se de que o Nginx tem permissão para acessar os arquivos com os comandos `sudo chown -R www-data:www-data /var/www/app_blog` e `sudo chmod -R 755 /var/www/app_blog`.
+
+### Reiniciar o Nginx
+
+
 
 ## Programas a Instalar
 
