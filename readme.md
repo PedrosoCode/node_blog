@@ -157,6 +157,19 @@ Verifique se o PostgreSQL está rodando corretamente:
 
    `sudo systemctl status postgresql`
 
+## Para dar restore no Banco
+
+Copiamos o arquivo para a pasta temp, enquanto como usuário comum, isso é necessário pois o usuário do postgres não possui acesso a home do usuário comum onde provavelmente o arquivo está localizado 
+
+`cp ~/bkps/bkp_blog /tmp/`
+
+Após isso, logamos com o usuário do postgres como `sudo -i -u postgres`
+
+Para restaurar o banco, podemos usar o seguinte comando `pg_restore --clean -U postgres -d MyBlogDB /tmp/bkp_blog`
+
+Ao conectar a VM pela máquina original, no pgadmin podemos rodar um `select * from users`, ou simplesmente verificar o esquema de tabelas, para confirmar se o restore funcionou.
+
+
 ## Programas a Instalar
 
 - Nginx
