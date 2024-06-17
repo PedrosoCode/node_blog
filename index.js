@@ -57,7 +57,11 @@ app.use((err, req, res, next) => {
   res.status(500).send('Algo quebrou!');
 });
 
-// Inicia o servidor
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`Servidor rodando em http://localhost:${port}`);
 });
+
+// Inicia o servidor
+//app.listen(port, () => {
+//  console.log(`Servidor rodando em http://localhost:${port}`);
+//});
