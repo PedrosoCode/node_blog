@@ -1,6 +1,10 @@
 //TODO - mudar o obter para uma stored procedure para melhor manutenção
+//TODO - Criar a função de delete
 
 const pool = require('../db/database');
+const { enviarEmailPedido } = require('../services/emailService');
+
+const nodemailer = require('nodemailer');
 
 const adicionarAoCarrinho = async (req, res) => {
     try {
@@ -73,16 +77,21 @@ const obterCarrinho = async (req, res) => {
   try {
     const usuario_id = req.usuario.id;
     const carrinho = await pool.query(
-      'SELECT c.*, p.titulo, p.descricao, p.image_path FROM tb_compras_carrinho_itens c JOIN tb_produtos p ON c.produto_id = p.id WHERE c.carrinho_id = $1',
+      `SELECT c.*, p.titulo, p.descricao, p.image_path 
+       FROM tb_compras_carrinho_itens c 
+       JOIN tb_produtos p ON c.produto_id = p.id 
+       JOIN tb_compras_carrinho carrinho ON c.carrinho_id = carrinho.id 
+       WHERE carrinho.usuario_id = $1`,
       [usuario_id]
     );
-
+    console.log('Carrinho do usuário:', carrinho.rows); // Log para depuração
     res.json(carrinho.rows);
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Erro no servidor');
   }
 };
+
 
 const removerDoCarrinho = async (req, res) => {
   try {
@@ -103,44 +112,51 @@ const removerDoCarrinho = async (req, res) => {
 
 const criarPedido = async (req, res) => {
   try {
-      const usuario_id = req.usuario.id;
+    const usuario_id = req.usuario.id;
 
-      // Obter itens do carrinho do usuário
-      const carrinho = await pool.query(
-          'SELECT * FROM tb_compras_carrinho_itens WHERE carrinho_id = $1',
-          [usuario_id]
+    // Obter itens do carrinho do usuário
+    const carrinho = await pool.query(
+      'SELECT * FROM tb_compras_carrinho_itens WHERE carrinho_id = (SELECT id FROM tb_compras_carrinho WHERE usuario_id = $1)',
+      [usuario_id]
+    );
+
+    if (carrinho.rows.length === 0) {
+      return res.status(400).json('Carrinho vazio');
+    }
+
+    // Calcular total do pedido
+    const total = carrinho.rows.reduce((acc, item) => acc + (item.quantidade * item.preco_unitario), 0);
+
+    // Criar pedido
+    const novoPedido = await pool.query(
+      'INSERT INTO tb_compras_pedidos (usuario_id, total, status) VALUES ($1, $2, $3) RETURNING *',
+      [usuario_id, total, 'Pendente']
+    );
+
+    const pedido_id = novoPedido.rows[0].id;
+
+    // Inserir itens do pedido
+    for (let item of carrinho.rows) {
+      await pool.query(
+        'INSERT INTO tb_compras_pedidos_itens (pedido_id, produto_id, quantidade, preco_unitario) VALUES ($1, $2, $3, $4)',
+        [pedido_id, item.produto_id, item.quantidade, item.preco_unitario]
       );
+    }
 
-      if (carrinho.rows.length === 0) {
-          return res.status(400).json('Carrinho vazio');
-      }
+    // Limpar carrinho
+    await pool.query('DELETE FROM tb_compras_carrinho_itens WHERE carrinho_id = (SELECT id FROM tb_compras_carrinho WHERE usuario_id = $1)', [usuario_id]);
 
-      // Calcular total do pedido
-      const total = carrinho.rows.reduce((acc, item) => acc + (item.quantidade * item.preco_unitario), 0);
+    // Obter e-mail do usuário
+    const usuario = await pool.query('SELECT email FROM users WHERE id = $1', [usuario_id]);
+    const emailUsuario = usuario.rows[0].email;
 
-      // Criar pedido
-      const novoPedido = await pool.query(
-          'INSERT INTO tb_compras_pedidos (usuario_id, total, status) VALUES ($1, $2, $3) RETURNING *',
-          [usuario_id, total, 'Pendente']
-      );
+    // Enviar e-mail para o usuário
+    enviarEmailPedido(emailUsuario, pedido_id, carrinho.rows, total);
 
-      const pedido_id = novoPedido.rows[0].id;
-
-      // Inserir itens do pedido
-      for (let item of carrinho.rows) {
-          await pool.query(
-              'INSERT INTO tb_compras_pedidos_itens (pedido_id, produto_id, quantidade, preco_unitario) VALUES ($1, $2, $3, $4)',
-              [pedido_id, item.produto_id, item.quantidade, item.preco_unitario]
-          );
-      }
-
-      // Limpar carrinho
-      await pool.query('DELETE FROM tb_compras_carrinho_itens WHERE carrinho_id = $1', [usuario_id]);
-
-      res.json(novoPedido.rows[0]);
+    res.json(novoPedido.rows[0]);
   } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Erro no servidor');
+    console.error(err.message);
+    res.status(500).send('Erro no servidor');
   }
 };
 
