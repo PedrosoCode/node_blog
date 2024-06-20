@@ -1,5 +1,6 @@
 //FIXME  - quando o front apaga uma imagem, apenas seus metadados são removidos do SQL, sendo que o arquivo permanece armazenado
 //TODO - usar Salt nas contas de usuário para que senhas iguais não tenham a mesma hash
+//TODO - Reorganizar a estrutura de pasta por módulos, semelhante a organização no frontend. Para melhor navegação e visualização
 //REVIEW - verificar uma forma mais dinâmica de usar a URL da API
 
 require('dotenv').config(); // Garanta que isso está no topo do arquivo principal
@@ -16,6 +17,8 @@ const imageRoutes = require('./src/routes/imageRoutes');
 const footerRoutes = require('./src/routes/footerRoutes');
 const productRoutes = require('./src/routes/productRoutes');
 const cartRoutes = require('./src/routes/cartRoutes');
+const damageTypesRoutes = require('./src/routes/damageTypesRoutes');
+const weaponRoutes = require('./src/routes/weaponRoutes');
 const { verificarToken } = require('./src/middlewares/authMiddleware');
 
 app.use(express.json());
@@ -32,14 +35,18 @@ app.get('/helloworld', (req, res) => {
 });
 
 // Use as rotas
+app.use('/uploads', express.static('uploads'));
 app.use('/api/auth', authRoutes);
 app.use('/api', postRoutes);
 app.use('/api', userRoutes);
 app.use('/api', imageRoutes); 
 app.use('/api', footerRoutes); 
 app.use('/api', productRoutes); 
-app.use('/uploads', express.static('uploads'));
 app.use('/api', cartRoutes);
+app.use('/api', damageTypesRoutes);
+app.use('/api', weaponRoutes);
+
+
 
 // Exemplo de rota protegida
 app.get('/dados-protegidos', verificarToken, (req, res) => {
