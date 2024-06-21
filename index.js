@@ -19,6 +19,7 @@ const productRoutes = require('./src/routes/productRoutes');
 const cartRoutes = require('./src/routes/cartRoutes');
 const damageTypesRoutes = require('./src/routes/damageTypesRoutes');
 const weaponRoutes = require('./src/routes/weaponRoutes');
+const cardRoutes = require('./src/routes/cardRoutes');
 const { verificarToken } = require('./src/middlewares/authMiddleware');
 
 app.use(express.json());
@@ -45,6 +46,7 @@ app.use('/api', productRoutes);
 app.use('/api', cartRoutes);
 app.use('/api', damageTypesRoutes);
 app.use('/api', weaponRoutes);
+app.use('/api', cardRoutes);
 
 
 
