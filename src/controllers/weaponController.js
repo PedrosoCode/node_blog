@@ -15,4 +15,17 @@ const criarArma = async (req, res) => {
   }
 };
 
-module.exports = { criarArma };
+const buscaArmas = async (req, res) => {
+  try {
+    const allWeapons = await pool.query('select * from fn_rpg_listar_armas()');
+    res.json(allWeapons.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+};
+
+
+module.exports = { criarArma, buscaArmas };
+
+
